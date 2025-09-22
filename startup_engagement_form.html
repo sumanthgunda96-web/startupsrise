@@ -1,0 +1,175 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Startup Engagement Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f4f4f4;
+        }
+        .form-step {
+            display: none;
+        }
+        .form-step.active {
+            display: block;
+        }
+        .form-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 600px;
+            margin: auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #0078D4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:disabled {
+            background-color: #ccc;
+        }
+        .contract-preview {
+            background-color: #eef;
+            padding: 15px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Startup Engagement Form</h2>
+        <form id="engagementForm">
+            <div class="form-step active" id="step1">
+                <label>Select Engagement Model:</label>
+                <select id="model" required>
+                    <option value="">--Choose--</option>
+                    <option value="contract">Contract-Based (Zero Upfront)</option>
+                    <option value="service">Service-Based (Paid Upfront)</option>
+                </select>
+                <button type="button" onclick="nextStep()">Next</button>
+            </div>
+
+            <div class="form-step" id="step2">
+                <label>Client Name:</label>
+                <input type="text" id="clientName" required>
+                <label>Project Title:</label>
+                <input type="text" id="projectTitle" required>
+                <label>Project Description:</label>
+                <textarea id="projectDesc" rows="4" required></textarea>
+                <button type="button" onclick="prevStep()">Back</button>
+                <button type="button" onclick="nextStep()">Next</button>
+            </div>
+
+            <div class="form-step" id="step3">
+                <label>Select Services:</label>
+                <select id="services" multiple required>
+                    <option value="Marketing">Marketing</option>
+                    <option value="SEO">SEO Optimization</option>
+                    <option value="AI Solutions">AI Solutions</option>
+                    <option value="Real Estate">Real Estate Development</option>
+                    <option value="Medicaid">Medicaid & Insurance</option>
+                    <option value="Content">Content Creation</option>
+                    <option value="OTT">Bulk OTT Subscriptions</option>
+                </select>
+                <button type="button" onclick="prevStep()">Back</button>
+                <button type="button" onclick="generateContract()">Next</button>
+            </div>
+
+            <div class="form-step" id="step4">
+                <label>Auto-Filled Contract Preview:</label>
+                <div class="contract-preview" id="contractPreview"></div>
+                <button type="button" onclick="prevStep()">Back</button>
+                <button type="submit">Submit</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        let currentStep = 1;
+
+        function showStep(step) {
+            document.querySelectorAll('.form-step').forEach((el, index) => {
+                el.classList.remove('active');
+                if (index === step - 1) el.classList.add('active');
+            });
+        }
+
+        function nextStep() {
+            if (validateStep(currentStep)) {
+                currentStep++;
+                showStep(currentStep);
+            }
+        }
+
+        function prevStep() {
+            currentStep--;
+            showStep(currentStep);
+        }
+
+        function validateStep(step) {
+            if (step === 1 && !document.getElementById('model').value) return false;
+            if (step === 2 && (!document.getElementById('clientName').value || !document.getElementById('projectTitle').value || !document.getElementById('projectDesc').value)) return false;
+            if (step === 3 && document.getElementById('services').selectedOptions.length === 0) return false;
+            return true;
+        }
+
+        function generateContract() {
+            const model = document.getElementById('model').value;
+            const clientName = document.getElementById('clientName').value;
+            const projectTitle = document.getElementById('projectTitle').value;
+            const projectDesc = document.getElementById('projectDesc').value;
+            const services = Array.from(document.getElementById('services').selectedOptions).map(opt => opt.value).join(', ');
+
+            let contractText = `Agreement between Umbrella Startup and ${clientName}
+
+`;
+            contractText += `Project: ${projectTitle}
+Description: ${projectDesc}
+Services: ${services}
+
+`;
+
+            if (model === 'contract') {
+                contractText += `Model: Contract-Based (Zero Upfront)
+Terms:
+- Umbrella Startup provides workforce and operational support.
+- ${clientName} covers all resource and service costs.
+- Profit-sharing applies upon successful revenue.
+- Umbrella Startup is not liable for losses.
+`;
+            } else {
+                contractText += `Model: Service-Based (Paid Upfront)
+Terms:
+- ${clientName} pays for selected services before execution.
+- Umbrella Startup delivers services as per scope.
+- No profit-sharing or liability clauses apply.
+`;
+            }
+
+            document.getElementById('contractPreview').innerText = contractText;
+            nextStep();
+        }
+
+        document.getElementById('engagementForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Form submitted successfully!');
+        });
+    </script>
+</body>
+</html>
